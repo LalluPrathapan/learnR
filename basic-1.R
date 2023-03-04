@@ -1,4 +1,5 @@
-#R Basics from data type to inital plots
+#R Basics from data type to inital plots adapted from Fundamentals of GIS using R and QGIS by Shammunul Islam
+
 
 library(ggplot2)
 

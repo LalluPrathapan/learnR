@@ -1,4 +1,4 @@
-#GIS in R
+#GIS in R (adapted from Fundamentals of GIS using R and QGIS by Shammunul Islam)
 # Plotting point data
 #Location is a point characterized by its coordinates
 
