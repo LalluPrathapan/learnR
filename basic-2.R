@@ -69,5 +69,46 @@ shp=st_read("/vsicurl/http://wesleysc352.github.io/seg_s3_r3_m10_fix_estat_amost
 
 #however the datafile we need couldn't be downloade so ???
 map_bd=readOGR("bd_adm","BGD_adm3_data_re")
-head(map_bd)
-str(map_bd,max.level = 2)
+
+head(map_bd@data)
+head(map_bd@polygons)
+str(map_bd@polygons,max.level = 2)
+
+# we can access the lists' slots using @ and any of the five slots 
+# access the 6th element of the map_bd
+
+#6th element in the polygons slot of map_bd
+sixth_element=map_bd@polygons[[6]]
+sixth_element
+#make it succinct with max.level=2 in str() for the 6th element of the bd@Polygons
+str(sixth_element,max.level = 2)
+# structure of the 2nd polygon inside sixth element
+str(sixth_element@Polygons[[2]],max.level = 2)
+
+#acessing the coordinate slot 
+#plot() the coords slot of the 2nd element of the sixth polygon slot
+plot(sixth_element@Polygons[[2]]@coords)
+
+
+#acesssing the data elements of SpatialPolygonsdataFrame we can use
+# either $ or [[]] as we can do with a dataframe
+
+#acessing the column or attribute Name_3
+map_bd$NAME_3
+###or
+map_bd[["NAME_3"]]
+
+
+## Add point data on polygon data
+#step 1: we plot the SpatialPolygonsDataFrame
+#step 2: add the SpatialPointsDataFrame using points()
+
+plot(map_bd)
+points(bd_val,pch=19,col="blue")
+
+
+#Changing projection system
+# to change projection we use spTransform() from rgdal package. 
+# this can be using the CRS() argument inside spTransform()":
+map_bd=spTransform(map_bd, CRS("+proj=longlat +datum=WGS84"))
+st_crs(map_bd) # gets the coordinate reference system
