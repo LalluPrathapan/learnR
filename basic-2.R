@@ -9,8 +9,9 @@
 #path is the first parameter and the name of the shapefile is second
 
 library(sf)
-#Spatial points
 library(sp)
+#Spatial points
+
 library(rgdal)
 library(maptools)
 map=readOGR("D:/EAGLE/MB2/learnR/learnR","indicator.csv")
@@ -71,6 +72,7 @@ shp=st_read("/vsicurl/http://wesleysc352.github.io/seg_s3_r3_m10_fix_estat_amost
 map_bd=readOGR("bd_adm","BGD_adm3_data_re")
 
 head(map_bd@data)
+str(map_bd@data)
 head(map_bd@polygons)
 str(map_bd@polygons,max.level = 2)
 
@@ -110,5 +112,53 @@ points(bd_val,pch=19,col="blue")
 #Changing projection system
 # to change projection we use spTransform() from rgdal package. 
 # this can be using the CRS() argument inside spTransform()":
-map_bd=spTransform(map_bd, CRS("+proj=longlat +datum=WGS84"))
+# didn't work map_bd=spTransform(map_bd, CRS("+init=epsg:26978"))
+# the sp package is replaced mostly with the sf package now ,but sp is still in use
+
+
 st_crs(map_bd) # gets the coordinate reference system
+
+proj4string(map_bd) <- CRS("+proj=longlat +datum=WGS84")
+
+
+#Plotting quantitative and qualitative data on a map
+# to show the quantitative values  in a geographical area it is good to use choropleth
+#ggplot gives ways to plot a choropleth
+#also basic R plot can be used
+
+#basic plot choropleth
+plot(map_bd,xlim=c(88.01,93.41) , ylim=c(21.34,26.38),col= as.numeric(map_bd$value2),bg = "#A6CAE0")
+
+#choropleth using ggplot
+#as ggplot uses a dataframe as input there is a additional step to follow
+#It is possible to make the convertion using the tidy function of the broom package as shown below.
+
+# I need to fortify the data AND keep trace of the commune code! (Takes ~2 minutes)
+
+
+#Building up a SpatialPolygons from scratch.
+
+# create polyon objects from coordinates.  Each object is a single geometric
+# polygon defined by a bounding line.
+house1.building <- Polygon(rbind(c(1, 1), c(2, 1), c(2, 0), c(1, 0)))
+
+house1.roof <- Polygon(rbind(c(1, 1), c(1.5, 2), c(2, 1)))
+
+house2.building <- Polygon(rbind(c(3, 1), c(4, 1), c(4, 0), c(3, 0)))
+
+house2.roof <- Polygon(rbind(c(3, 1), c(3.5, 2), c(4, 1)))
+
+house2.door <- Polygon(rbind(c(3.25, 0.75), c(3.75, 0.75), c(3.75, 0), c(3.25, 
+                                                                         0)), hole = TRUE)
+
+# create lists of polygon objects from polygon objects and unique ID A
+# `Polygons` is like a single observation.
+h1 <- Polygons(list(house1.building, house1.roof), "house1")
+h2 <- Polygons(list(house2.building, house2.roof, house2.door), "house2")
+
+# create spatial polygons object from lists A SpatialPolygons is like a
+# shapefile or layer.
+houses <- SpatialPolygons(list(h1, h2))
+plot(houses)
+
+
