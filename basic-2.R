@@ -161,4 +161,56 @@ h2 <- Polygons(list(house2.building, house2.roof, house2.door), "house2")
 houses <- SpatialPolygons(list(h1, h2))
 plot(houses)
 
+#add attributes
+#we can associate dataframes with spatial polygons
+#When you first associate a data.frame with a SpatialPolygons object,
+#R will line up rows and polygons by matching Polygons object names with the data.frame row.names.
+#After the initial association, this relationship is NO LONGER based on row.names! 
+#For the rest of the SpatialPolygonsDataFrame’s life, the association between Polygons and rows of your data.frame is based on the order of rows in your data.frame, 
+#so don’t try to change the order of the data.frame by hand!
 
+#Make attributes and plot. Note how the door – which we created with hole=TRUE is empty!
+
+attr <- data.frame(attr1 = 1:2, attr2 = 6:5, row.names = c("house2", "house1"))
+attr
+houses.DF <- SpatialPolygonsDataFrame(houses, attr)
+class(houses.DF)
+
+as.data.frame(houses.DF)#notice how the rows were reoordered
+spplot(houses.DF)
+
+#adding crs
+crs.geo <- CRS("+init=EPSG:4326")  # geographical, datum WGS84
+proj4string(houses.DF) <- crs.geo  # define projection system of our data
+houses.DF
+
+#Creating the polygon object
+SA <- Polygon(rbind(c(16, -29), c(33, -21), c(33, -29), c(26, -34), c(17, -35)))
+hole<- rbind(c(29, -28), c(27, -30), c(28, -31),c(29,-28))
+lesotho<-rbind(c(29, -28), c(27, -30), c(28, -31),c(29,-28))
+#polygon objects
+sa.hole.poly<-Polygon(hole,hole=TRUE)
+lesotho.poly<-Polygon(lesotho)
+#----Make a (highly stylized) SpatialPolygon object for Lesotho and South Africa based on a given points
+#creating polygonS objects
+SA.outline=Polygons(list(SA, sa.hole.poly), "SA")
+lesotho.outline=Polygons(list(lesotho.poly), "lesotho")
+ 
+#spatial polygon
+map <- SpatialPolygons(list(SA.outline, lesotho.outline))
+plot(map)
+
+# adding the attribute table with each countries GDP per capita
+#(~7000 for SA and 1000 for lesotho)
+
+attr.sa<- data.frame(c(7000,1000), row.names = c("SA", "lesotho"))
+attr.sa
+
+#adding the gdp data to the spatial polygon
+SA.DF <- SpatialPolygonsDataFrame(map, attr.sa)
+
+# adding WGS 84 coordinate system
+proj4string(SA.DF)<-CRS("+init=EPSG:4326")
+
+#plot 
+spplot(SA.DF)
