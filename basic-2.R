@@ -137,6 +137,8 @@ plot(map_bd,xlim=c(88.01,93.41) , ylim=c(21.34,26.38),col= as.numeric(map_bd$val
 
 
 #Building up a SpatialPolygons from scratch.
+#adapted https://www.nickeubank.com/wp-content/uploads/2015/10/RGIS1_SpatialDataTypes_part1_vectorData.html
+#https://www.emilyburchfield.org/courses/gsa/5_spatial_intro_lab.html
 
 # create polyon objects from coordinates.  Each object is a single geometric
 # polygon defined by a bounding line.
@@ -208,9 +210,44 @@ attr.sa
 
 #adding the gdp data to the spatial polygon
 SA.DF <- SpatialPolygonsDataFrame(map, attr.sa)
-
+class(SA.DF)
+head(SA.DF@data)
 # adding WGS 84 coordinate system
 proj4string(SA.DF)<-CRS("+init=EPSG:4326")
 
 #plot 
 spplot(SA.DF)
+
+#plot qualitative data
+library(RColorBrewer)
+dhaka_div=readOGR("qualitative_data_plot","dhaka_div")
+class(dhaka_div)
+str(dhaka_div)
+head(dhaka_div@data)
+unique(dhaka_div$NAME_3)
+#There are 7 unique districts and so pick 7 colors
+#these are the 7 districts where our goal is to color different district of dhaka
+
+#we use list of color pallet from Rcolorbrewer package
+# a list of all the color pallets that come with RColorBrewer with the command:
+
+display.brewer.all()
+
+#Once you’ve picked a palette you like, create a palette object as follows, where n is the number of cuts you want to use, and name is the name of the color ramp. 
+#Note that different palettes have different limits on the maximium and minimium number of cuts allowed.
+my.pallete<-brewer.pal(n=12,name="Set3")
+#olorRampPalette() function in R Language is used to create a color range between two colors specified as arguments to the function. This function is used to specify the starting and ending color of the range.
+colors=colorRampPalette(my.pallete)(7)
+#the qualitative attribute or column of SpatialPolygonDataFrame is
+#converted into column and we use suitable color range
+dhaka_div$NAME_3=as.factor(as.character(dhaka_div$NAME_3))
+spplot(dhaka_div,"NAME_3",main="Coloring different districts of Dhaka division",col.regions=colors,col="white")
+
+# using tmap for easier quick and dirty mapping(tmap-thematic mapping)
+library(tmap)
+tmap_tip()
+
+#choropleth maps using tmap.. We use qtm() fn in tmap to pass the 
+#coloum to plot as argument in qtm() function for plotting choropleth
+
+
