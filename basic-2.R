@@ -250,4 +250,6 @@ tmap_tip()
 #choropleth maps using tmap.. We use qtm() fn in tmap to pass the 
 #coloum to plot as argument in qtm() function for plotting choropleth
 
-
+map_bd_2=readOGR("tmap_data","BGD_adm3_data_re")
+head(map_bd_2@data)
+str(map_bd_2@data)
